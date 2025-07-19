@@ -91,6 +91,26 @@ flowchart LR
 
 ## Getting Started - Local Deployment
 
+### Option A: Quick Start with Kind (Recommended)
+
+For a complete, automated deployment experience using Kind (Kubernetes in Docker) with Helm charts:
+
+```bash
+# Run the complete deployment with one command
+./kind-deployment/run-all.sh
+```
+
+This will:
+- Create a Kind cluster with local registry
+- Build and push Docker images for MCP Gateway and example server
+- Deploy MCP Gateway using the Helm chart
+- Deploy an example MCP server
+- Run a demo client showing the complete workflow
+
+For detailed documentation and step-by-step instructions, see the [Kind Deployment Guide](kind-deployment/README.md).
+
+### Option B: Manual Local Development Setup
+
 ### 1. Prepare Local Development Environment
 - [Install .NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 - [Install Docker Desktop](https://docs.docker.com/desktop/)
@@ -172,6 +192,37 @@ kubectl port-forward -n adapter svc/mcpgateway-service 8000:8000
    ```sh
    kubectl delete namespace adapter
    ```
+
+## Docker Images & Helm Charts
+
+The MCP Gateway is available as:
+
+- **Docker Image**: `ghcr.io/nkbud/mcp-gateway:latest`
+- **Helm Chart**: `oci://ghcr.io/nkbud/helm/mcp-gateway`
+
+### Using the Helm Chart
+
+```bash
+# Add the Helm repository (if using HTTP-based repository)
+# Or pull from OCI registry:
+helm pull oci://ghcr.io/nkbud/helm/mcp-gateway --version 0.1.0
+
+# Install with custom values
+helm install mcp-gateway oci://ghcr.io/nkbud/helm/mcp-gateway \
+  --namespace mcp-gateway --create-namespace \
+  --set image.tag=latest \
+  --set service.type=LoadBalancer
+```
+
+### Production Deployment
+
+For production deployments, use the production values:
+
+```bash
+helm install mcp-gateway oci://ghcr.io/nkbud/helm/mcp-gateway \
+  --namespace mcp-gateway --create-namespace \
+  --values helm/mcp-gateway/values-production.yaml
+```
 
 ## Getting Started - Deploy to Azure
 

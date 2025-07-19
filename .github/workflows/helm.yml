@@ -1,0 +1,41 @@
+name: Build and Publish Helm Chart
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'helm/**'
+      - '.github/workflows/helm.yml'
+
+jobs:
+  helm:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v4
+      with:
+        version: 'v3.14.0'
+
+    - name: Log in to GHCR
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Package Helm chart
+      run: |
+        helm package helm/mcp-gateway --destination .helm-packages/
+
+    - name: Push Helm chart to GHCR
+      run: |
+        helm push .helm-packages/*.tgz oci://ghcr.io/nkbud/helm
