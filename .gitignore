@@ -398,3 +398,10 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Helm chart packages
+.helm-packages/
+*.tgz
+
+# Kind deployment temporary files
+/tmp/mcp-gateway-port-forward.pid
